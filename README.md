@@ -39,6 +39,7 @@ Ad 2. Wyedytować plik befitscheduler.properties, który zawiera sekcję
 Kluczem jest nazwa dnia tygodnia po angielsku z dużej litery, wartością indexy tabeli w kalendarzu {tr} oraz {td}, domyslnie są tam wpisane zajęcia na popołudniowe bodypump. Jak chcemy dokładnie wiedzieć użyjmy zbadaj element w przeglądarce i sprawdźmy xpath danych zajęć. Powinien wyglądać np tak:
 
 (Fitball we Wtorek)
+
   //*[@id="scheduler"]/div[1]/table/tbody/tr[2]/td[3]/div/p[2]
 
 Niestety nie można dodać dwóch zajęć na ten sam dzień, jak chcesz zrób brancha ;)
