@@ -1,5 +1,5 @@
 __author__ = 'p.slodkiewicz@gmail.com'
-__name__ = 'befitSheduller'
+__name__ = 'befitScheduler'
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 import datetime
