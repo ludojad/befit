@@ -34,6 +34,7 @@ Niestety nie można dodać dwóch zajęć na ten sam dzień, jak chcesz zrób br
 Tu podajemy dane logowania do befit (uważaj aby nie spushować swojego hasła do repo :P)
 
 Ad 3. Uruchomić skrypt:
+
   python befitScheduler.py&
 
 Wszystkie zdarzenia będą w pliku befitScheduler.log
