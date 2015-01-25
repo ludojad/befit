@@ -7,8 +7,8 @@ import time
 import logging
 import ConfigParser
 
-PROP_FILE = 'befitSheduller.properties'
-LOG_FILE = 'befitSheduller.log'
+PROP_FILE = 'befitScheduler.properties'
+LOG_FILE = 'befitScheduler.log'
 logging.basicConfig(filename=LOG_FILE,
                     level=logging.INFO,
                     datefmt='%A-%m-%d %H:%M',
