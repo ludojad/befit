@@ -27,7 +27,7 @@ class Scheduller:
         return datetime.date.today().strftime("%A")
 
     def getWorkoutDayName(self):
-        sign_day = datetime.date.today() + datetime.timedelta(days=3)
+        sign_day = datetime.date.today() + datetime.timedelta(days=5)
         return sign_day.strftime("%A")
 
     def getTrTableWorkout(self, workout_day_name):
@@ -74,7 +74,7 @@ class Selenium:
         driver.find_element_by_id("Password").send_keys(config.get('auth', 'password'))
         driver.find_element_by_id("SubmitCredentials").click()
 
-        if scheduler.getNowDayName() in ('Friday', 'Saturday', 'Sunday'):
+        if scheduler.getNowDayName() in ('Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'):
             driver.find_element_by_css_selector("div.week_chooser > a.right").click()
 
         try:
