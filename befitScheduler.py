@@ -1,6 +1,7 @@
 __author__ = 'p.slodkiewicz@gmail.com'
 __name__ = 'befitScheduler'
 from selenium import webdriver
+from pyvirtualdisplay import Display
 from selenium.common.exceptions import NoSuchElementException
 import datetime
 import time
@@ -10,7 +11,7 @@ import ConfigParser
 PROP_FILE = 'befitScheduler.properties'
 LOG_FILE = 'befitScheduler.log'
 logging.basicConfig(filename=LOG_FILE,
-                    level=logging.INFO,
+                    level=logging.DEBUG,
                     datefmt='%A-%m-%d %H:%M',
                     format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger(__name__)
@@ -53,8 +54,12 @@ class Scheduller:
 
 class Selenium:
     def __init__(self):
-        self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(5)
+
+	display = Display(visible=0, size=(1024, 768))
+	display.start()
+        
+	self.driver = webdriver.Firefox()
+        self.driver.implicitly_wait(10)
         self.base_url = "https://befit-cms.efitness.com.pl/"
         self.verificationErrors = []
         self.accept_next_alert = True
@@ -87,23 +92,28 @@ class Selenium:
             isWorkoutAlredySigned = True
             log.info(scheduler.getWorkoutDayName() + ' workout allready signed ...')
         driver.quit()
-        return None
+	return None
 
 
 log.info('Befit scheduller started')
+
 while True:
     with open(LOG_FILE, 'a') as f:
         f.write('.')
     Now = datetime.date.today().strftime("%A")
     tries = 5
     time.sleep(120)
-    if Now != datetime.date.today().strftime("%A"):
+    if Now == datetime.date.today().strftime("%A"):
         s = Scheduller()
         if s.isWorkoutInSchedule(s.getWorkoutDayName()):
             for i in range(0, tries):
                 if isWorkoutAlredySigned:
                     tries = 0
                 else:
-                    selenium = Selenium()
-                    selenium.sign_to_workout()
-                    tries -= 1
+		    	try:	
+                    		selenium = Selenium()
+	              		selenium.sign_to_workout()
+		    		tries -= 1
+				time.sleep(5)
+			except:
+				log.error("Selenium error")
