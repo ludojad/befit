@@ -11,13 +11,12 @@ import ConfigParser
 PROP_FILE = 'befitScheduler.properties'
 LOG_FILE = 'befitScheduler.log'
 logging.basicConfig(filename=LOG_FILE,
-                    level=logging.DEBUG,
-                    datefmt='%A-%m-%d %H:%M',
+                    level=logging.INFO,
+                    datefmt='%A-%m-%d %H:%M:%S',
                     format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger(__name__)
 config = ConfigParser.RawConfigParser()
 config.read(PROP_FILE)
-isWorkoutAlredySigned = False
 
 
 class Scheduller:
@@ -41,25 +40,26 @@ class Scheduller:
         try:
             return config.get('app', workout_day_name).split(';')[1]
         except ConfigParser.NoOptionError:
-            return log.debug('No workouts to sign today ...')
+            return log.info('No workouts to sign today ...')
 
     def isWorkoutInSchedule(self, workout_day_name):
         try:
             config.get('app', workout_day_name)
             return True
         except ConfigParser.NoOptionError:
-            log.debug('No workouts to sign today ...')
+            log.info('No workouts to sign today ...')
             return False
 
 
 class Selenium:
     def __init__(self):
 
-	display = Display(visible=0, size=(1024, 768))
-	display.start()
-        
-	self.driver = webdriver.Firefox()
+        display = Display(visible=0, size=(1024, 768))
+        display.start()
+
+        self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
+        self.driver.set_page_load_timeout(30)
         self.base_url = "https://befit-cms.efitness.com.pl/"
         self.verificationErrors = []
         self.accept_next_alert = True
@@ -87,33 +87,29 @@ class Selenium:
                 '//*[@id=\"scheduler\"]/div[1]/table/tbody/tr[{0}]/td[{1}]/div/p[1]'.format(str(tr), str(td))).click()
             driver.find_element_by_xpath('//*[@id="calendar-register-for-class"]').click()
             log.info(scheduler.getWorkoutDayName() + ' workout sign succeed :)')
+            return True
         except NoSuchElementException:
-            global isWorkoutAlredySigned
-            isWorkoutAlredySigned = True
-            log.info(scheduler.getWorkoutDayName() + ' workout allready signed ...')
+            return False
         driver.quit()
-	return None
 
 
 log.info('Befit scheduller started')
 
 while True:
-    with open(LOG_FILE, 'a') as f:
-        f.write('.')
+    isWorkoutAlredySigned = False
     Now = datetime.date.today().strftime("%A")
-    tries = 5
-    time.sleep(120)
+    time.sleep(float(config.get('conf', 'interval')))
     if Now == datetime.date.today().strftime("%A"):
+        log.info('Day changed, looking for workouts')
         s = Scheduller()
         if s.isWorkoutInSchedule(s.getWorkoutDayName()):
-            for i in range(0, tries):
+            for i in range(0, 5):
                 if isWorkoutAlredySigned:
-                    tries = 0
+                    break
                 else:
-		    	try:	
-                    		selenium = Selenium()
-	              		selenium.sign_to_workout()
-		    		tries -= 1
-				time.sleep(5)
-			except:
-				log.error("Selenium error")
+                    try:
+                        log.info('Starting selenium')
+                        selenium = Selenium()
+                        isWorkoutAlredySigned = selenium.sign_to_workout()
+                    except Exception:
+                        time.sleep(float(config.get('conf', 'interval')))
