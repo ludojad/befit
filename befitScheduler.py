@@ -99,7 +99,7 @@ while True:
     isWorkoutAlredySigned = False
     Now = datetime.date.today().strftime("%A")
     time.sleep(float(config.get('conf', 'interval')))
-    if Now == datetime.date.today().strftime("%A"):
+    if Now != datetime.date.today().strftime("%A"):
         log.info('Day changed, looking for workouts')
         s = Scheduller()
         if s.isWorkoutInSchedule(s.getWorkoutDayName()):
